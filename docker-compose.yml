@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  gapp-database:
+    image: mysql:8.0
+    ports:
+      - "3308:3306"
+    container_name: gapp-database
+    volumes:
+      - dbdata:/var/lib/mysql
+    restart: always
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    environment:
+      MYSQL_ROOT_PASSWORD: gameappRoo7t0lk2o20
+      MYSQL_DATABASE: gameapp_db
+      MYSQL_USER: gameapp
+      MYSQL_PASSWORD: gameappt0lk2o20
+
+
+volumes:
+  dbdata:
