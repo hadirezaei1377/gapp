@@ -1,6 +1,8 @@
 package phonenumber
 
-import "strconv"
+import (
+	"strconv"
+)
 
 func IsValid(phoneNumber string) bool {
 
@@ -12,7 +14,7 @@ func IsValid(phoneNumber string) bool {
 		return false
 	}
 
-	if _, err := strconv.Atoi(phoneNumber[2:]); err == nil {
+	if _, err := strconv.Atoi(phoneNumber[2:]); err != nil {
 		return false
 	}
 
