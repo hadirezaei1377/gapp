@@ -10,11 +10,16 @@ import (
 	"net/http"
 )
 
+const (
+	JwtSignKey = "jwt_secret"
+)
+
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health-check", healthCheckHandler)
 	mux.HandleFunc("/users/register", userRegisterHandler)
 	mux.HandleFunc("/users/login", userLoginHandler)
+	mux.HandleFunc("/users/profile", userProfileHandler)
 
 	log.Println("server is listening on port 8088...")
 	server := http.Server{Addr: ":8088", Handler: mux}
@@ -44,7 +49,7 @@ func userRegisterHandler(writer http.ResponseWriter, req *http.Request) {
 	}
 
 	mysqlRepo := mysql.New()
-	userSvc := userservice.New(mysqlRepo)
+	userSvc := userservice.New(mysqlRepo, JwtSignKey)
 
 	_, err = userSvc.Register(uReq)
 	if err != nil {
@@ -85,9 +90,9 @@ func userLoginHandler(writer http.ResponseWriter, req *http.Request) {
 	}
 
 	mysqlRepo := mysql.New()
-	userSvc := userservice.New(mysqlRepo)
+	userSvc := userservice.New(mysqlRepo, JwtSignKey)
 
-	_, err = userSvc.Login(lReq)
+	resp, err := userSvc.Login(lReq)
 	if err != nil {
 		writer.Write([]byte(
 			fmt.Sprintf(`{"error": "%s"}`, err.Error()),
@@ -96,5 +101,61 @@ func userLoginHandler(writer http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	writer.Write([]byte(`{"message": "user credentials is ok"}`))
+	data, err = json.Marshal(resp)
+	if err != nil {
+		writer.Write([]byte(
+			fmt.Sprintf(`{"error": "%s"}`, err.Error()),
+		))
+
+		return
+	}
+
+	writer.Write(data)
+}
+
+func userProfileHandler(writer http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		fmt.Fprintf(writer, `{"error": "invalid method"}`)
+	}
+
+	pReq := userservice.ProfileRequest{UserID: 0}
+
+	data, err := io.ReadAll(req.Body)
+	if err != nil {
+		writer.Write([]byte(
+			fmt.Sprintf(`{"error": "%s"}`, err.Error()),
+		))
+	}
+
+	err = json.Unmarshal(data, &pReq)
+	if err != nil {
+		writer.Write([]byte(
+			fmt.Sprintf(`{"error": "%s"}`, err.Error()),
+		))
+
+		return
+	}
+
+	mysqlRepo := mysql.New()
+	userSvc := userservice.New(mysqlRepo, JwtSignKey)
+
+	resp, err := userSvc.Profile(pReq)
+	if err != nil {
+		writer.Write([]byte(
+			fmt.Sprintf(`{"error": "%s"}`, err.Error()),
+		))
+
+		return
+	}
+
+	data, err = json.Marshal(resp)
+	if err != nil {
+		writer.Write([]byte(
+			fmt.Sprintf(`{"error": "%s"}`, err.Error()),
+		))
+
+		return
+	}
+
+	writer.Write(data)
 }
