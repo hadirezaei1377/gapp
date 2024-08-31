@@ -1,6 +1,8 @@
 package userservice
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"gapp/entity"
 	"gapp/pkg/phonenumber"
@@ -18,6 +20,7 @@ type Service struct {
 type RegisterRequest struct {
 	Name        string `json:"name"`
 	PhoneNumber string `json:"phone_number"`
+	Password    string `json:"password"`
 }
 
 type RegisterResponse struct {
@@ -51,10 +54,17 @@ func (s Service) Register(req RegisterRequest) (RegisterResponse, error) {
 		return RegisterResponse{}, fmt.Errorf("name length should be greater than 3")
 	}
 
+	// validate password
+	if len(req.Password) < 8 {
+		return RegisterResponse{}, fmt.Errorf("password length should be greater than 8")
+	}
+
+	// TODO - replace md5 with bcrypt
 	user := entity.User{
 		ID:          0,
 		PhoneNumber: req.PhoneNumber,
 		Name:        req.Name,
+		Password:    getMD5Hash(req.Password),
 	}
 
 	// create new user in storage
@@ -67,4 +77,9 @@ func (s Service) Register(req RegisterRequest) (RegisterResponse, error) {
 	return RegisterResponse{
 		User: createdUser,
 	}, nil
+}
+
+func getMD5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
 }
