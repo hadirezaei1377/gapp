@@ -1,0 +1,5 @@
+production:
+  dialect: mysql
+  datasource: gapp:gappt0lk2o20@(localhost:3308)/gapp_db?parseTime=true
+  dir: repository/mysql/migrations
+  table: migrations
