@@ -1,7 +1,6 @@
 package httpserver
 
 import (
-	"fmt"
 	"gapp/service/userservice"
 	"net/http"
 
@@ -37,7 +36,6 @@ func (s Server) userRegister(c echo.Context) error {
 }
 
 func (s Server) userProfile(c echo.Context) error {
-	fmt.Println("c.GetAuthorization", c.Get("Authorization"))
 	authToken := c.Request().Header.Get("Authorization")
 	claims, err := s.authSvc.ParseToken(authToken)
 	if err != nil {

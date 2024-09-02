@@ -19,8 +19,6 @@ const (
 )
 
 func main() {
-	fmt.Println("start echo server")
-
 	cfg := config.Config{
 		HTTPServer: config.HTTPServer{Port: 8088},
 		Auth: authservice.Config{
@@ -31,11 +29,11 @@ func main() {
 			RefreshSubject:        RefreshTokenSubject,
 		},
 		Mysql: mysql.Config{
-			Username: "gapp",
-			Password: "13131313777777",
+			Username: "gameapp",
+			Password: "gameappt0lk2o20",
 			Port:     3308,
 			Host:     "localhost",
-			DBName:   "gapp_db",
+			DBName:   "gameapp_db",
 		},
 	}
 
@@ -43,6 +41,7 @@ func main() {
 
 	server := httpserver.New(cfg, authSvc, userSvc)
 
+	fmt.Println("start echo server")
 	server.Serve()
 }
 
