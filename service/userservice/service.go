@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"gapp/entity"
 	"gapp/pkg/phonenumber"
+
+	"gapp/pkg/richerror"
 )
 
 type Repository interface {
@@ -46,6 +48,7 @@ func New(authGenerator AuthGenerator, repo Repository) Service {
 }
 
 func (s Service) Register(req RegisterRequest) (RegisterResponse, error) {
+	// TODO - we should verify phone number by verification code
 
 	// validate phone number
 	if !phonenumber.IsValid(req.PhoneNumber) {
@@ -68,11 +71,13 @@ func (s Service) Register(req RegisterRequest) (RegisterResponse, error) {
 		return RegisterResponse{}, fmt.Errorf("name length should be greater than 3")
 	}
 
+	// TODO - check the password with regex pattern
 	// validate password
 	if len(req.Password) < 8 {
 		return RegisterResponse{}, fmt.Errorf("password length should be greater than 8")
 	}
 
+	// TODO - replace md5 with bcrypt
 	user := entity.User{
 		ID:          0,
 		PhoneNumber: req.PhoneNumber,
@@ -115,9 +120,13 @@ type LoginResponse struct {
 }
 
 func (s Service) Login(req LoginRequest) (LoginResponse, error) {
+	const op = "userservice.Login"
+
+	// TODO - it would be better to user two separate method for existence check and getUserByPhoneNumber
 	user, exist, err := s.repo.GetUserByPhoneNumber(req.PhoneNumber)
 	if err != nil {
-		return LoginResponse{}, fmt.Errorf("unexpected error: %w", err)
+		return LoginResponse{}, richerror.New(op).WithErr(err).
+			WithMeta(map[string]interface{}{"phone_number": req.PhoneNumber})
 	}
 
 	if !exist {
@@ -161,13 +170,12 @@ type ProfileResponse struct {
 // all request inputs for interactor/service should be sanitized.
 
 func (s Service) Profile(req ProfileRequest) (ProfileResponse, error) {
-	// getUserByID
+	const op = "userservice.Profile"
+
 	user, err := s.repo.GetUserByID(req.UserID)
 	if err != nil {
-		// I don't expect the repository call return "record not found" error,
-		// because I assume the interactor input is sanitized.
-		// TODO - we can use Rich Error.
-		return ProfileResponse{}, fmt.Errorf("unexpected error: %w", err)
+		return ProfileResponse{}, richerror.New(op).WithErr(err).
+			WithMeta(map[string]interface{}{"req": req})
 	}
 
 	return ProfileResponse{Name: user.Name}, nil
