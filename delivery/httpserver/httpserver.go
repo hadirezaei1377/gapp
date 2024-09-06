@@ -5,22 +5,25 @@ import (
 	"gapp/config"
 	"gapp/service/authservice"
 	"gapp/service/userservice"
+	"gapp/validator/uservalidator"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 type Server struct {
-	config  config.Config
-	authSvc authservice.Service
-	userSvc userservice.Service
+	config        config.Config
+	authSvc       authservice.Service
+	userSvc       userservice.Service
+	userValidator uservalidator.Validator
 }
 
-func New(config config.Config, authSvc authservice.Service, userSvc userservice.Service) Server {
+func New(config config.Config, authSvc authservice.Service, userSvc userservice.Service, userValidator uservalidator.Validator) Server {
 	return Server{
-		config:  config,
-		authSvc: authSvc,
-		userSvc: userSvc,
+		config:        config,
+		authSvc:       authSvc,
+		userSvc:       userSvc,
+		userValidator: userValidator,
 	}
 }
 

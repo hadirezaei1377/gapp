@@ -7,6 +7,7 @@ import (
 	"gapp/repository/mysql"
 	"gapp/service/authservice"
 	"gapp/service/userservice"
+	"gapp/validator/uservalidator"
 	"time"
 )
 
@@ -37,19 +38,25 @@ func main() {
 		},
 	}
 
-	authSvc, userSvc := setupServices(cfg)
+	// TODO - add command for migrations
+	//mgr := migrator.New(cfg.Mysql)
+	//mgr.Up()
 
-	server := httpserver.New(cfg, authSvc, userSvc)
+	authSvc, userSvc, userValidator := setupServices(cfg)
+
+	server := httpserver.New(cfg, authSvc, userSvc, userValidator)
 
 	fmt.Println("start echo server")
 	server.Serve()
 }
 
-func setupServices(cfg config.Config) (authservice.Service, userservice.Service) {
+func setupServices(cfg config.Config) (authservice.Service, userservice.Service, uservalidator.Validator) {
 	authSvc := authservice.New(cfg.Auth)
 
 	MysqlRepo := mysql.New(cfg.Mysql)
 	userSvc := userservice.New(authSvc, MysqlRepo)
 
-	return authSvc, userSvc
+	uV := uservalidator.New(MysqlRepo)
+
+	return authSvc, userSvc, uV
 }

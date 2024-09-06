@@ -1,12 +1,12 @@
 package httpserver
 
 import (
+	"gapp/dto"
+	"gapp/pkg/httpmsg"
 	"gapp/service/userservice"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-
-	"gapp/pkg/httpmsg"
 )
 
 func (s Server) userLogin(c echo.Context) error {
@@ -24,9 +24,17 @@ func (s Server) userLogin(c echo.Context) error {
 }
 
 func (s Server) userRegister(c echo.Context) error {
-	var req userservice.RegisterRequest
+	var req dto.RegisterRequest
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest)
+	}
+
+	if err, fieldErrors := s.userValidator.ValidateRegisterRequest(req); err != nil {
+		msg, code := httpmsg.Error(err)
+		return c.JSON(code, echo.Map{
+			"message": msg,
+			"errors":  fieldErrors,
+		})
 	}
 
 	resp, err := s.userSvc.Register(req)

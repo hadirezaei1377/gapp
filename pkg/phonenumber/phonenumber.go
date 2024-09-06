@@ -5,6 +5,7 @@ import (
 )
 
 func IsValid(phoneNumber string) bool {
+	// TODO - we can use regular expression to support +98 pattern
 
 	if len(phoneNumber) != 11 {
 		return false
