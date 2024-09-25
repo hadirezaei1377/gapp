@@ -1,6 +1,4 @@
-package dto
-
-// data transfer object
+package param
 
 type RegisterRequest struct {
 	Name        string `json:"name"`

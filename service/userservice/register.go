@@ -2,11 +2,11 @@ package userservice
 
 import (
 	"fmt"
-	"gapp/dto"
 	"gapp/entity"
+	"gapp/param"
 )
 
-func (s Service) Register(req dto.RegisterRequest) (dto.RegisterResponse, error) {
+func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, error) {
 	// TODO - we should verify phone number by verification code
 
 	// TODO - replace md5 with bcrypt
@@ -20,11 +20,11 @@ func (s Service) Register(req dto.RegisterRequest) (dto.RegisterResponse, error)
 	// create new user in storage
 	createdUser, err := s.repo.Register(user)
 	if err != nil {
-		return dto.RegisterResponse{}, fmt.Errorf("unexpected error: %w", err)
+		return param.RegisterResponse{}, fmt.Errorf("unexpected error: %w", err)
 	}
 
 	// return created user
-	return dto.RegisterResponse{User: dto.UserInfo{
+	return param.RegisterResponse{User: param.UserInfo{
 		ID:          createdUser.ID,
 		PhoneNumber: createdUser.Name,
 		Name:        createdUser.PhoneNumber,

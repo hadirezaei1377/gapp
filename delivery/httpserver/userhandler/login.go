@@ -1,7 +1,7 @@
 package userhandler
 
 import (
-	"gapp/dto"
+	"gapp/param"
 	"gapp/pkg/httpmsg"
 	"net/http"
 
@@ -9,7 +9,7 @@ import (
 )
 
 func (h Handler) userLogin(c echo.Context) error {
-	var req dto.LoginRequest
+	var req param.LoginRequest
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest)
 	}
