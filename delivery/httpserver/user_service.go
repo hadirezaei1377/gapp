@@ -1,7 +1,7 @@
 package httpserver
 
 import (
-	"gapp/dto"
+	dto "gapp/param"
 	"gapp/pkg/httpmsg"
 	"net/http"
 

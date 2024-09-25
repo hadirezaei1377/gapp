@@ -9,11 +9,11 @@ import (
 )
 
 type Config struct {
-	SignKey               string
-	AccessExpirationTime  time.Duration
-	RefreshExpirationTime time.Duration
-	AccessSubject         string
-	RefreshSubject        string
+	SignKey               string        `koanf:"sign_key"`
+	AccessExpirationTime  time.Duration `koanf:"access_expiration_time"`
+	RefreshExpirationTime time.Duration `koanf:"refresh_expiration_time"`
+	AccessSubject         string        `koanf:"access_subject"`
+	RefreshSubject        string        `koanf:"refresh_subject"`
 }
 
 type Service struct {
@@ -54,6 +54,8 @@ func (s Service) ParseToken(bearerToken string) (*Claims, error) {
 }
 
 func (s Service) createToken(userID uint, subject string, expireDuration time.Duration) (string, error) {
+	// create a signer for rsa 256
+	// TODO - replace with rsa 256 RS256 - https://github.com/golang-jwt/jwt/blob/main/http_example_test.go
 
 	// set our claims
 	claims := Claims{
@@ -64,6 +66,7 @@ func (s Service) createToken(userID uint, subject string, expireDuration time.Du
 		UserID: userID,
 	}
 
+	// TODO - add sign method to config
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := accessToken.SignedString([]byte(s.config.SignKey))
 	if err != nil {

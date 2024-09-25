@@ -1,19 +1,21 @@
 package userhandler
 
 import (
+	"gapp/config"
 	"gapp/param"
 	"gapp/pkg/httpmsg"
+	"gapp/service/authservice"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
+func getClaims(c echo.Context) *authservice.Claims {
+	return c.Get(config.AuthMiddlewareContextKey).(*authservice.Claims)
+}
+
 func (h Handler) userProfile(c echo.Context) error {
-	authToken := c.Request().Header.Get("Authorization")
-	claims, err := h.authSvc.ParseToken(authToken)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
+	claims := getClaims(c)
 
 	resp, err := h.userSvc.Profile(param.ProfileRequest{UserID: claims.UserID})
 	if err != nil {
