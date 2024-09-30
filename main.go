@@ -6,6 +6,7 @@ import (
 	"gapp/delivery/httpserver"
 	"gapp/repository/mysql"
 	"gapp/repository/mysql/migrator"
+	"gapp/service/authorizationservice"
 	"gapp/service/authservice"
 	"gapp/service/userservice"
 	"gapp/validator/uservalidator"
@@ -49,21 +50,25 @@ func main() {
 	mgr := migrator.New(cfg.Mysql)
 	mgr.Up()
 
-	authSvc, userSvc, userValidator := setupServices(cfg)
+	authSvc, userSvc, userValidator, backofficeSvc, authorizationSvc := setupServices(cfg)
 
-	server := httpserver.New(cfg, authSvc, userSvc, userValidator)
+	server := httpserver.New(cfg, authSvc, userSvc, userValidator, backofficeSvc, authorizationSvc)
 
 	fmt.Println("start echo server")
 	server.Serve()
 }
 
-func setupServices(cfg config.Config) (authservice.Service, userservice.Service, uservalidator.Validator) {
+func setupServices(cfg config.Config) (
+	authservice.Service, userservice.Service, uservalidator.Validator,
+	backofficeuserservice.Service, authorizationservice.Service) {
 	authSvc := authservice.New(cfg.Auth)
 
 	MysqlRepo := mysql.New(cfg.Mysql)
-	userSvc := userservice.New(authSvc, MysqlRepo)
-
-	uV := uservalidator.New(MysqlRepo)
-
-	return authSvc, userSvc, uV
+	userMysql := mysqluser.New(MysqlRepo)
+	userSvc := userservice.New(authSvc, userMysql)
+	backofficeUserSvc := backofficeuserservice.New()
+	aclMysql := mysqlaccesscontrol.New(MysqlRepo)
+	authorizationSvc := authorizationservice.New(aclMysql)
+	uV := uservalidator.New(userMysql)
+	return authSvc, userSvc, uV, backofficeUserSvc, authorizationSvc
 }

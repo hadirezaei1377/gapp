@@ -15,6 +15,7 @@ func (s Service) Register(req param.RegisterRequest) (param.RegisterResponse, er
 		PhoneNumber: req.PhoneNumber,
 		Name:        req.Name,
 		Password:    getMD5Hash(req.Password),
+		Role:        entity.UserRole,
 	}
 
 	// create new user in storage

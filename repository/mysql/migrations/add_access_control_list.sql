@@ -1,7 +1,7 @@
 -- +migrate Up
 CREATE TABLE `access_controls` (
                                 `id` int primary key AUTO_INCREMENT,
-                                `actor_id` VARCHAR(191) NOT NULL UNIQUE,
+                                `actor_id` int NOT NULL,
                                 `actor_type` ENUM('role', 'user') NOT NULL,
                                 `permission_id` INT NOT NULL,
                                 `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

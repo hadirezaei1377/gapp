@@ -1,4 +1,4 @@
-package mysql
+package mysqluser
 
 import (
 	"database/sql"
@@ -9,10 +9,10 @@ import (
 	"time"
 )
 
-func (d *MySQLDB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
+func (d *DB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
 	const op = "mysql.IsPhoneNumberUnique"
 
-	row := d.db.QueryRow(`select * from users where phone_number = ?`, phoneNumber)
+	row := d.conn.Conn().QueryRow(`select * from users where phone_number = ?`, phoneNumber)
 
 	_, err := scanUser(row)
 	if err != nil {
@@ -27,8 +27,9 @@ func (d *MySQLDB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
 	return false, nil
 }
 
-func (d *MySQLDB) Register(u entity.User) (entity.User, error) {
-	res, err := d.db.Exec(`insert into users(name, phone_number, password) values(?, ?, ?)`, u.Name, u.PhoneNumber, u.Password)
+func (d *DB) Register(u entity.User) (entity.User, error) {
+	res, err := d.conn.Conn().Exec(`insert into users(name, phone_number, password, role) values(?, ?, ?, ?)`,
+		u.Name, u.PhoneNumber, u.Password, u.Role.String())
 	if err != nil {
 		return entity.User{}, fmt.Errorf("can't execute command: %w", err)
 	}
@@ -40,10 +41,10 @@ func (d *MySQLDB) Register(u entity.User) (entity.User, error) {
 	return u, nil
 }
 
-func (d *MySQLDB) GetUserByPhoneNumber(phoneNumber string) (entity.User, error) {
+func (d *DB) GetUserByPhoneNumber(phoneNumber string) (entity.User, error) {
 	const op = "mysql.GetUserByPhoneNumber"
 
-	row := d.db.QueryRow(`select * from users where phone_number = ?`, phoneNumber)
+	row := d.conn.Conn().QueryRow(`select * from users where phone_number = ?`, phoneNumber)
 
 	user, err := scanUser(row)
 	if err != nil {
@@ -63,7 +64,7 @@ func (d *MySQLDB) GetUserByPhoneNumber(phoneNumber string) (entity.User, error) 
 func (d *MySQLDB) GetUserByID(userID uint) (entity.User, error) {
 	const op = "mysql.GetUserByID"
 
-	row := d.db.QueryRow(`select * from users where id = ?`, userID)
+	row := d.conn.Conn().QueryRow(`select * from users where id = ?`, userID)
 
 	user, err := scanUser(row)
 	if err != nil {
@@ -79,11 +80,13 @@ func (d *MySQLDB) GetUserByID(userID uint) (entity.User, error) {
 	return user, nil
 }
 
-func scanUser(row *sql.Row) (entity.User, error) {
+func scanUser(scanner mysql.Scanner) (entity.User, error) {
 	var createdAt time.Time
 	var user entity.User
 
-	err := row.Scan(&user.ID, &user.Name, &user.PhoneNumber, &createdAt, &user.Password)
-	fmt.Println("createdAt", createdAt)
+	var roleStr string
+	err := scanner.Scan(&user.ID, &user.Name, &user.PhoneNumber, &createdAt, &user.Password, &roleStr)
+	user.Role = entity.MapToRoleEntity(roleStr)
+
 	return user, err
 }
