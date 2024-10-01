@@ -1,9 +1,21 @@
 ---
 type: yml
 auth:
-  sign_key: hello
+  sign_key: jwt_secret
+http_server:
+  port: 8088
+
 
 mysql:
   port: 3308
   host: localhost
-  db_name: gameapp_db
+  db_name: gapp_db
+  username: gapp
+  password: gappt0lk2o20
+redis:
+  port: 6380
+  host: localhost
+  db: 0
+  password: ""
+matching_service:
+  waiting_timeout: "2m"

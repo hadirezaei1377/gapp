@@ -1,7 +1,18 @@
 version: '3.7'
 
 services:
-  gapp-database:
+gapp-redis:
+    image: bitnami/redis:6.2
+    container_name: gapp-redis
+    restart: always
+    ports:
+      - '6380:6379'
+    command: redis-server --loglevel warning --protected-mode no
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - gapp-redis-data:/data 
+gapp-database:
     image: mysql:8.0
     ports:
       - "3308:3306"
@@ -18,4 +29,5 @@ services:
 
 
 volumes:
-  dbdata:
+  dbdata:dbdata:
+  gameapp-redis-data:

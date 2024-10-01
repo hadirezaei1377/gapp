@@ -4,7 +4,7 @@ import "time"
 
 type Game struct {
 	ID          uint
-	CategoryID  uint
+	Category    Category
 	QuestionIDs []uint
 	PlayerIDs   []uint
 	StartTime   time.Time
@@ -24,4 +24,7 @@ type PlayerAnswer struct {
 	PlayerID   uint
 	QuestionID uint
 	Choice     PossibleAnswerChoice
+}
+
+func data() {
 }
