@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"gapp/config"
 	"gapp/delivery/httpserver/backofficeuserhandler"
+	"gapp/delivery/httpserver/matchinghandler"
 	"gapp/delivery/httpserver/userhandler"
 	"gapp/service/authorizationservice"
 	"gapp/service/authservice"
 	"gapp/service/backofficeuserservice"
+	"gapp/service/matchingservice"
 	"gapp/service/userservice"
+	"gapp/validator/matchingvalidator"
 	"gapp/validator/uservalidator"
 
 	"github.com/labstack/echo/v4"
@@ -49,5 +52,7 @@ func (s Server) Serve() {
 	s.matchingHandler.SetRoutes(e)
 
 	// Start server
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", s.config.HTTPServer.Port)))
+	address := fmt.Sprintf(":%d", s.config.HTTPServer.Port)
+	fmt.Printf("start echo server on %s\n", address)
+	e.Logger.Fatal(e.Start(address))
 }
