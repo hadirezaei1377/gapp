@@ -22,6 +22,7 @@ import (
 	"gapp/validator/uservalidator"
 	"os"
 	"os/signal"
+	"sync"
 	"time"
 )
 
@@ -47,9 +48,12 @@ func main() {
 		server.Serve()
 	}()
 	done := make(chan bool)
+
+	var wg sync.WaitGroup
 	go func() {
-		sch := scheduler.New()
-		sch.Start(done)
+		sch := scheduler.New(matchingSvc)
+		wg.Add(1)
+		sch.Start(done, &wg)
 	}()
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
@@ -63,7 +67,8 @@ func main() {
 	fmt.Println("received interrupt signal, shutting down gracefully..")
 	done <- true
 	time.Sleep(cfg.Application.GracefulShutdownTimeout)
-	// TODO - the context doesn't wait for scheduler to finish its job..
+
+	// TODO - does order of ctx.Done & wg.Wait matter?
 	<-ctxWithTimeout.Done()
 }
 

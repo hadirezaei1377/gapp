@@ -1,6 +1,7 @@
 package matchingservice
 
 import (
+	"fmt"
 	"gapp/entity"
 	"gapp/param"
 	"gapp/pkg/richerror"
@@ -31,4 +32,9 @@ func (s Service) AddToWaitingList(req param.AddToWaitingListRequest) (
 			richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 	}
 	return param.AddToWaitingListResponse{Timeout: s.config.WaitingTimeout}, nil
+}
+
+func (s Service) MatchWaitedUsers(req param.MatchWaitedUsersRequest) (param.MatchWaitedUsersResponse, error) {
+	fmt.Println("MatchWaitedUsers", time.Now())
+	return param.MatchWaitedUsersResponse{}, nil
 }
