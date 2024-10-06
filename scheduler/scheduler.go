@@ -14,6 +14,7 @@ func New() Scheduler {
 
 // long-running process
 func (s Scheduler) Start(done <-chan bool) {
+	// TODO - add lock or distributed lock
 	fmt.Println("scheduler started")
 	for {
 		select {

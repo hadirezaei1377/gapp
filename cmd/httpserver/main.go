@@ -8,11 +8,9 @@ import (
 	"gapp/delivery/httpserver"
 	"gapp/repository/migrator"
 	"gapp/repository/mysql"
-	"gapp/repository/mysql/migrator"
 	"gapp/repository/mysql/mysqlaccesscontrol"
 	"gapp/repository/mysql/mysqluser"
 	"gapp/repository/redis/redismatching"
-	"gapp/scheduler"
 	"gapp/service/authorizationservice"
 	"gapp/service/authservice"
 	"gapp/service/backofficeuserservice"
@@ -22,7 +20,8 @@ import (
 	"gapp/validator/uservalidator"
 	"os"
 	"os/signal"
-	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 const (
@@ -33,23 +32,15 @@ func main() {
 	// TODO - read config path from command line
 	cfg := config.Load("config.yml")
 	fmt.Printf("cfg: %+v\n", cfg)
-
 	// TODO - add command for migrations
 	mgr := migrator.New(cfg.Mysql)
 	mgr.Up()
-
 	// TODO - add struct and add these returned items as struct field
 	authSvc, userSvc, userValidator, backofficeSvc, authorizationSvc, matchingSvc, matchingV := setupServices(cfg)
-
-	server := httpserver.New(cfg, authSvc, userSvc, userValidator, backofficeSvc, authorizationSvc, matchingSvc, matchingV)
-
+	var httpServer *echo.Echo
 	go func() {
-		server.Serve()
-	}()
-	done := make(chan bool)
-	go func() {
-		sch := scheduler.New()
-		sch.Start(done)
+		server := httpserver.New(cfg, authSvc, userSvc, userValidator, backofficeSvc, authorizationSvc, matchingSvc, matchingV)
+		httpServer = server.Serve()
 	}()
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
@@ -57,23 +48,18 @@ func main() {
 	ctx := context.Background()
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, cfg.Application.GracefulShutdownTimeout)
 	defer cancel()
-	if err := server.Router.Shutdown(ctxWithTimeout); err != nil {
+	if err := httpServer.Shutdown(ctxWithTimeout); err != nil {
 		fmt.Println("http server shutdown error", err)
 	}
 	fmt.Println("received interrupt signal, shutting down gracefully..")
-	done <- true
-	time.Sleep(cfg.Application.GracefulShutdownTimeout)
-	// TODO - the context doesn't wait for scheduler to finish its job..
 	<-ctxWithTimeout.Done()
 }
-
 func setupServices(cfg config.Config) (
 	authservice.Service, userservice.Service, uservalidator.Validator,
 	backofficeuserservice.Service, authorizationservice.Service,
 	matchingservice.Service, matchingvalidator.Validator,
 ) {
 	authSvc := authservice.New(cfg.Auth)
-
 	MysqlRepo := mysql.New(cfg.Mysql)
 	userMysql := mysqluser.New(MysqlRepo)
 	userSvc := userservice.New(authSvc, userMysql)
