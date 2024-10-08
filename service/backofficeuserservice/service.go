@@ -7,6 +7,7 @@ type Service struct{}
 func New() Service {
 	return Service{}
 }
+
 func (s Service) ListAllUsers() ([]entity.User, error) {
 	// TODO - implement me
 	list := make([]entity.User, 0)

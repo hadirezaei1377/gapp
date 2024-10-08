@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"gapp/entity"
 	"gapp/pkg/richerror"
-	"time"
+
+	"gapp/pkg/timestamp"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -19,11 +20,12 @@ func (d DB) AddToWaitingList(userID uint, category entity.Category) error {
 	_, err := d.adapter.Client().
 		ZAdd(context.Background(),
 			fmt.Sprintf("%s:%s", WaitingListPrefix, category),
-			redis.Z{Score: float64(time.Now().UnixMicro()),
+			redis.Z{Score: float64(timestamp.Now()),
 				Member: fmt.Sprintf("%d", userID),
 			}).Result()
 	if err != nil {
 		return richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 	}
+
 	return nil
 }

@@ -13,21 +13,33 @@ const (
 )
 
 func (r Role) String() string {
+
 	switch r {
 	case UserRole:
+
 		return UserRoleStr
+
 	case AdminRole:
+
 		return AdminRoleStr
 	}
+
 	return ""
 }
 
 func MapToRoleEntity(roleStr string) Role {
+
 	switch roleStr {
+
 	case UserRoleStr:
+
 		return UserRole
+
 	case AdminRoleStr:
+
 		return AdminRole
+
 	}
+
 	return Role(0)
 }

@@ -6,5 +6,6 @@ func DoesExist(list []uint, value uint) bool {
 			return true
 		}
 	}
+
 	return false
 }

@@ -26,12 +26,14 @@ func (v Validator) ValidateAddToWaitingListRequest(req param.AddToWaitingListReq
 				}
 			}
 		}
+
 		return fieldErrors, richerror.New(op).WithMessage(errmsg.ErrorMsgInvalidInput).
 			WithKind(richerror.KindInvalid).
 			WithMeta(map[string]interface{}{"req": req}).WithErr(err)
 	}
 	return nil, nil
 }
+
 func (v Validator) isCategoryValid(value interface{}) error {
 	category := value.(entity.Category)
 	if !category.IsValid() {

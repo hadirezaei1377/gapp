@@ -11,9 +11,11 @@ import (
 type Repo interface {
 	AddToWaitingList(userID uint, category entity.Category) error
 }
+
 type Config struct {
 	WaitingTimeout time.Duration `koanf:"waiting_timeout"`
 }
+
 type Service struct {
 	config Config
 	repo   Repo
@@ -22,6 +24,7 @@ type Service struct {
 func New(config Config, repo Repo) Service {
 	return Service{config: config, repo: repo}
 }
+
 func (s Service) AddToWaitingList(req param.AddToWaitingListRequest) (
 	param.AddToWaitingListResponse, error) {
 	const op = richerror.Op("matchingservice.AddToWaitingList")
