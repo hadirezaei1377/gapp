@@ -34,7 +34,8 @@ func (d DB) AddToWaitingList(userID uint, category entity.Category) error {
 
 func (d DB) GetWaitingListByCategory(ctx context.Context, category entity.Category) ([]entity.WaitingMember, error) {
 	const op = richerror.Op("redismatching.GetWaitingListByCategory")
-	min := fmt.Sprintf("%d", timestamp.Add(-2*time.Hour))
+	// TODO - add to config
+	min := fmt.Sprintf("%d", timestamp.Add(-200000*time.Hour))
 	max := strconv.Itoa(int(timestamp.Now()))
 	list, err := d.adapter.Client().ZRangeByScoreWithScores(ctx, getCategoryKey(category), &redis.ZRangeBy{
 		Min:    min,

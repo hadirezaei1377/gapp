@@ -3,6 +3,7 @@ package scheduler
 import (
 	"context"
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -41,6 +42,7 @@ func (s Scheduler) Start(done <-chan bool, wg *sync.WaitGroup) {
 }
 
 func (s Scheduler) MatchWaitedUsers() {
+	log.Println("MatchWaitedUsers started")
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 	// get lock

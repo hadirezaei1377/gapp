@@ -10,6 +10,8 @@ import (
 	"sync"
 
 	"time"
+
+	"github.com/labstack/gommon/log"
 )
 
 type Repo interface {
@@ -75,8 +77,14 @@ func (s Service) match(ctx context.Context, category entity.Category, wg *sync.W
 	if err != nil {
 		// TODO - log error
 		// TODO - update metrics
+		log.Errorf("GetWaitingListByCategory, err: %v\n", err)
 		return
 	}
+
+	if len(userIDs) < 2 {
+		return
+	}
+
 	presenceUserIDs := make([]uint, len(list))
 	for _, l := range presenceList.Items {
 		presenceUserIDs = append(presenceUserIDs, l.UserID)
@@ -98,7 +106,7 @@ func (s Service) match(ctx context.Context, category entity.Category, wg *sync.W
 	for i := 0; i < len(finalList)-1; i = i + 2 {
 		mu := entity.MatchedUsers{
 			Category: category,
-			UserID:   []uint{finalList[i].UserID, finalList[i+1].UserID},
+			UserIDs:  []uint{finalList[i].UserID, finalList[i+1].UserID},
 		}
 		fmt.Println("mu", mu)
 		// publish a new event for mu

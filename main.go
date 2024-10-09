@@ -42,8 +42,14 @@ func main() {
 	mgr := migrator.New(cfg.Mysql)
 	mgr.Up()
 
+	presenceGrpcConn, err := grpc.Dial(":8086", grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
+	defer presenceGrpcConn.Close()
+
 	// TODO - add struct and add these returned items as struct field
-	authSvc, userSvc, userValidator, backofficeSvc, authorizationSvc, matchingSvc, matchingV, presenceSvc := setupServices(cfg)
+	authSvc, userSvc, userValidator, backofficeSvc, authorizationSvc, matchingSvc, matchingV, presenceSvc := setupServices(cfg, presenceGrpcConn)
 
 	server := httpserver.New(cfg, authSvc, userSvc, userValidator, backofficeSvc, authorizationSvc,
 		matchingSvc, matchingV, presenceSvc)
@@ -82,7 +88,7 @@ func main() {
 	wg.Wait()
 }
 
-func setupServices(cfg config.Config) (
+func setupServices(cfg config.Config, presenceGrpcConn *grpc.ClientConn) (
 	authservice.Service, userservice.Service, uservalidator.Validator,
 	backofficeuserservice.Service, authorizationservice.Service,
 	matchingservice.Service, matchingvalidator.Validator,
@@ -110,13 +116,11 @@ func setupServices(cfg config.Config) (
 	presenceSvc := presenceservice.New(cfg.PresenceService, presenceRepo)
 
 	matchingRepo := redismatching.New(redisAdapter)
-	// TODO - replace presenceSvc with presence grpc client
-	conn, err := grpc.Dial(":8086", grpc.WithInsecure())
-	if err != nil {
-		panic(err)
-	}
+
 	defer conn.Close()
-	presenceAdapter := presenceClient.New(conn)
+
+	presenceAdapter := presenceClient.New(presenceGrpcConn)
+
 	matchingSvc := matchingservice.New(cfg.MatchingService, matchingRepo, presenceAdapter)
 
 	return authSvc, userSvc, uV, backofficeUserSvc, authorizationSvc, matchingSvc, matchingV, presenceSvc
