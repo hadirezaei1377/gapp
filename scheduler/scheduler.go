@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -40,5 +41,14 @@ func (s Scheduler) Start(done <-chan bool, wg *sync.WaitGroup) {
 }
 
 func (s Scheduler) MatchWaitedUsers() {
-	s.matchSvc.MatchWaitedUsers(param.MatchWaitedUsersRequest{})
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	// get lock
+	_, err := s.matchSvc.MatchWaitedUsers(ctx, param.MatchWaitedUsersRequest{})
+	if err != nil {
+		// TODO - log err
+		// TODO - update metrics
+		fmt.Println("matchSvc.MatchWaitedUsers error", err)
+	}
+	// free lock
 }

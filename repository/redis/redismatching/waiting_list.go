@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"gapp/entity"
 	"gapp/pkg/richerror"
+	"strconv"
+	"time"
 
 	"gapp/pkg/timestamp"
 
@@ -28,4 +30,34 @@ func (d DB) AddToWaitingList(userID uint, category entity.Category) error {
 	}
 
 	return nil
+}
+
+func (d DB) GetWaitingListByCategory(ctx context.Context, category entity.Category) ([]entity.WaitingMember, error) {
+	const op = richerror.Op("redismatching.GetWaitingListByCategory")
+	min := fmt.Sprintf("%d", timestamp.Add(-2*time.Hour))
+	max := strconv.Itoa(int(timestamp.Now()))
+	list, err := d.adapter.Client().ZRangeByScoreWithScores(ctx, getCategoryKey(category), &redis.ZRangeBy{
+		Min:    min,
+		Max:    max,
+		Offset: 0,
+		Count:  0,
+	}).Result()
+
+	if err != nil {
+		return nil, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
+	}
+	var result = make([]entity.WaitingMember, 0)
+	for _, l := range list {
+		userID, _ := strconv.Atoi(l.Member.(string))
+		result = append(result, entity.WaitingMember{
+			UserID:    uint(userID),
+			Timestamp: int64(l.Score),
+			Category:  category,
+		})
+	}
+	return result, nil
+}
+
+func getCategoryKey(category entity.Category) string {
+	return fmt.Sprintf("%s:%s", WaitingListPrefix, category)
 }
