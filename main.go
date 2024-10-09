@@ -25,6 +25,8 @@ import (
 	"os/signal"
 	"sync"
 	"time"
+
+	"google.golang.org/grpc"
 )
 
 const (
@@ -109,7 +111,13 @@ func setupServices(cfg config.Config) (
 
 	matchingRepo := redismatching.New(redisAdapter)
 	// TODO - replace presenceSvc with presence grpc client
-	matchingSvc := matchingservice.New(cfg.MatchingService, matchingRepo, presenceSvc)
+	conn, err := grpc.Dial(":8086", grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
+	presenceAdapter := presenceClient.New(conn)
+	matchingSvc := matchingservice.New(cfg.MatchingService, matchingRepo, presenceAdapter)
 
 	return authSvc, userSvc, uV, backofficeUserSvc, authorizationSvc, matchingSvc, matchingV, presenceSvc
 }

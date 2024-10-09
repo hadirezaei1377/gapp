@@ -41,5 +41,10 @@ func (s Service) Upsert(ctx context.Context, req param.UpsertPresenceRequest) (p
 }
 
 func (s Service) GetPresence(ctx context.Context, request param.GetPresenceRequest) (param.GetPresenceResponse, error) {
-	return param.GetPresenceResponse{}, nil
+	fmt.Println("req", request)
+	// TODO - implement me
+	return param.GetPresenceResponse{Items: []param.GetPresenceItem{
+		{UserID: 1, Timestamp: 12452151},
+		{UserID: 2, Timestamp: 124534551},
+	}}, nil
 }
