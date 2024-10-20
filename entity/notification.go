@@ -1,6 +1,6 @@
 package entity
 
 type Notification struct {
-	EventType string
-	Payload   string
+	EventType string `json:"event_type"`
+	Payload   string `json:"payload"`
 }
