@@ -26,6 +26,8 @@ import (
 	"os/signal"
 	"sync"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 const (
@@ -35,7 +37,8 @@ const (
 func main() {
 	// TODO - read config path from command line
 	cfg := config.Load("config.yml")
-	fmt.Printf("cfg: %+v\n", cfg)
+
+	logger.Logger.Named("main").Info("config", zap.Any("config", cfg))
 
 	// TODO - add command for migrations
 	mgr := migrator.New(cfg.Mysql)
@@ -68,6 +71,7 @@ func main() {
 	defer cancel()
 
 	if err := server.Router.Shutdown(ctxWithTimeout); err != nil {
+		// TODO - replace all fmt.Print.. and std log calls with logger.Logger
 		fmt.Println("http server shutdown error", err)
 	}
 
