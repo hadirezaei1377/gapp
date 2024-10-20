@@ -133,7 +133,7 @@ func (s Service) match(ctx context.Context, category entity.Category, wg *sync.W
 		fmt.Println("mu", mu)
 
 		go s.pub.Publish(entity.MatchingUsersMatchedEvent,
-			protobufencoder.EncodeEvent(entity.MatchingUsersMatchedEvent, mu))
+			protobufencoder.EncodeMatchingUsersMatchedEvent(mu))
 		// publish a new event for mu
 
 		// remove mu users from waiting list

@@ -34,26 +34,8 @@ func main() {
 }
 
 func processUsersMatchedEvent(topic string, data string) {
-	//payload, err := base64.StdEncoding.DecodeString(data)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//pbMu := matching.MatchedUsers{}
-	//if err := proto.Unmarshal(payload, &pbMu); err != nil {
-	//	panic(err)
-	//}
-	//
-	//mu := entity.MatchedUsers{
-	//	Category: entity.Category(pbMu.Category),
-	//	UserIDs:  slice.MapFromUint64ToUint(pbMu.UserIds),
-	//}
 
-	payload := protobufencoder.DecodeEvent(entity.Event(topic), data)
-	mu, ok := payload.(entity.MatchedUsers)
-	if !ok {
-		panic(ok)
-	}
+	mu := protobufencoder.DecodeMatchingUsersMatchedEvent(data)
 
 	fmt.Println("Received message from " + topic + " topic.")
 	fmt.Printf("matched users %+v\n", mu)
