@@ -8,7 +8,6 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-
 	UserID uint        `json:"user_id"`
 	Role   entity.Role `json:"role"`
 }

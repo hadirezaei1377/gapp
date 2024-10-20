@@ -25,7 +25,6 @@ func (p PossibleAnswerChoice) IsValid() bool {
 	return false
 }
 
-// enums
 const (
 	PossibleAnswerA PossibleAnswerChoice = iota + 1
 	PossibleAnswerB

@@ -8,9 +8,8 @@ import (
 )
 
 func (h Handler) SetRoutes(e *echo.Echo) {
-
 	userGroup := e.Group("/backoffice/users")
+
 	userGroup.GET("/", h.listUsers, middleware.Auth(h.authSvc, h.authConfig),
 		middleware.AccessCheck(h.authorizationSvc, entity.UserListPermission))
-
 }

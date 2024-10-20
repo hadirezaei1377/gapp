@@ -14,9 +14,7 @@ type Handler struct {
 }
 
 func New(authConfig authservice.Config, authSvc authservice.Service,
-
 	backofficeUserSvc backofficeuserservice.Service, authorizationSvc authorizationservice.Service) Handler {
-
 	return Handler{
 		authConfig:        authConfig,
 		authSvc:           authSvc,

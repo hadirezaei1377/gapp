@@ -2,7 +2,6 @@ package redis
 
 import (
 	"fmt"
-
 	"github.com/redis/go-redis/v9"
 )
 
@@ -23,6 +22,7 @@ func New(config Config) Adapter {
 		Password: config.Password,
 		DB:       config.DB,
 	})
+
 	return Adapter{client: rdb}
 }
 

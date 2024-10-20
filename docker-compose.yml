@@ -1,9 +1,9 @@
 version: '3.7'
 
 services:
-gapp-redis:
+  gameapp-redis:
     image: bitnami/redis:6.2
-    container_name: gapp-redis
+    container_name: gameapp-redis
     restart: always
     ports:
       - '6380:6379'
@@ -12,17 +12,17 @@ gapp-redis:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     volumes:
-      - gapp-redis-data:/data 
-gapp-database:
+      - gameapp-redis-data:/data
+  gameapp-database:
     image: mysql:8.0
     ports:
       - "3308:3306"
-    container_name: gapp-database
+    container_name: gameapp-database
     volumes:
       - dbdata:/var/lib/mysql
     restart: always
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-    environment: 
+    environment:
       MYSQL_ROOT_PASSWORD: gameappRoo7t0lk2o20
       MYSQL_DATABASE: gameapp_db
       MYSQL_USER: gameapp
@@ -30,5 +30,5 @@ gapp-database:
 
 
 volumes:
-  dbdata:dbdata:
+  dbdata:
   gameapp-redis-data:

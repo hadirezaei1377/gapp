@@ -25,6 +25,7 @@ func Load(configPath string) Config {
 	k.Load(env.Provider("GAMEAPP_", ".", func(s string) string {
 		str := strings.Replace(strings.ToLower(
 			strings.TrimPrefix(s, "GAMEAPP_")), "_", ".", -1)
+
 		// TODO - this is just a workaround
 		// for multiword items such as "sign_key" that we should use like "GAMEAPP_AUTH_SIGN__KEY"
 		// find a better solution if needed..

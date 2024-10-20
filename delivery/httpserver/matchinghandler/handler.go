@@ -19,7 +19,6 @@ func New(authConfig authservice.Config, authSvc authservice.Service,
 	matchingSvc matchingservice.Service,
 	matchingValidator matchingvalidator.Validator,
 	presenceSvc presenceservice.Service) Handler {
-
 	return Handler{
 		authConfig:        authConfig,
 		authSvc:           authSvc,

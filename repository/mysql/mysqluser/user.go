@@ -86,7 +86,9 @@ func scanUser(scanner mysql.Scanner) (entity.User, error) {
 	var user entity.User
 
 	var roleStr string
+
 	err := scanner.Scan(&user.ID, &user.Name, &user.PhoneNumber, &createdAt, &user.Password, &roleStr)
+
 	user.Role = entity.MapToRoleEntity(roleStr)
 
 	return user, err

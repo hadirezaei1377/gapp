@@ -27,9 +27,7 @@ func New(cfg Config) Service {
 }
 
 func (s Service) CreateAccessToken(user entity.User) (string, error) {
-
 	return s.createToken(user.ID, user.Role, s.config.AccessSubject, s.config.AccessExpirationTime)
-
 }
 
 func (s Service) CreateRefreshToken(user entity.User) (string, error) {

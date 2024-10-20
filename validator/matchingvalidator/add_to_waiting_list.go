@@ -12,12 +12,15 @@ import (
 
 func (v Validator) ValidateAddToWaitingListRequest(req param.AddToWaitingListRequest) (map[string]string, error) {
 	const op = "matchingvalidator.AddToWaitingListRequest"
+
 	if err := validation.ValidateStruct(&req,
+
 		validation.Field(&req.Category,
 			validation.Required,
 			validation.By(v.isCategoryValid)),
 	); err != nil {
 		fieldErrors := make(map[string]string)
+
 		errV, ok := err.(validation.Errors)
 		if ok {
 			for key, value := range errV {
@@ -31,13 +34,16 @@ func (v Validator) ValidateAddToWaitingListRequest(req param.AddToWaitingListReq
 			WithKind(richerror.KindInvalid).
 			WithMeta(map[string]interface{}{"req": req}).WithErr(err)
 	}
+
 	return nil, nil
 }
 
 func (v Validator) isCategoryValid(value interface{}) error {
 	category := value.(entity.Category)
+
 	if !category.IsValid() {
 		return fmt.Errorf(errmsg.ErrorMsgCategoryIsNotValid)
 	}
+
 	return nil
 }

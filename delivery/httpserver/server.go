@@ -2,10 +2,11 @@ package httpserver
 
 import (
 	"fmt"
-	"gapp/config"
+	"gaapp/config"
 	"gapp/delivery/httpserver/backofficeuserhandler"
 	"gapp/delivery/httpserver/matchinghandler"
 	"gapp/delivery/httpserver/userhandler"
+	"gapp/logger"
 	"gapp/service/authorizationservice"
 	"gapp/service/authservice"
 	"gapp/service/backofficeuserservice"

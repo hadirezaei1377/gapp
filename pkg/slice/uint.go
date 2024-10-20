@@ -15,6 +15,7 @@ func MapFromUint64ToUint(l []uint64) []uint {
 	for i := range l {
 		r[i] = uint(l[i])
 	}
+
 	return r
 }
 
@@ -23,5 +24,6 @@ func MapFromUintToUint64(l []uint) []uint64 {
 	for i := range l {
 		r[i] = uint64(l[i])
 	}
+
 	return r
 }

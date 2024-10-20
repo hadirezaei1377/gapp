@@ -14,7 +14,6 @@ const (
 )
 
 func main() {
-
 	// TODO - read config path from command line
 	cfg := config.Load("config.yml")
 	fmt.Printf("cfg: %+v\n", cfg)
@@ -27,7 +26,6 @@ func main() {
 	}()
 
 	quit := make(chan os.Signal, 1)
-
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 

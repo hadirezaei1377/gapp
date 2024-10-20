@@ -3,12 +3,10 @@ package scheduler
 import (
 	"context"
 	"fmt"
-	"log"
-	"sync"
-	"time"
-
 	"gapp/param"
 	"gapp/service/matchingservice"
+	"log"
+	"sync"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -17,6 +15,7 @@ import (
 type Config struct {
 	MatchWaitedUsersIntervalInSeconds int `koanf:"match_waited_users_interval_in_seconds"`
 }
+
 type Scheduler struct {
 	sch      *gocron.Scheduler
 	matchSvc matchingservice.Service
@@ -30,11 +29,15 @@ func New(config Config, matchSvc matchingservice.Service) Scheduler {
 		sch:      gocron.NewScheduler(time.UTC)}
 }
 
-// long-running process
 func (s Scheduler) Start(done <-chan bool, wg *sync.WaitGroup) {
+	// TODO - add lock or distributed lock
+
 	defer wg.Done()
+
 	s.sch.Every(s.config.MatchWaitedUsersIntervalInSeconds).Second().Do(s.MatchWaitedUsers)
+
 	s.sch.StartAsync()
+
 	<-done
 	// wait to finish job
 	fmt.Println("stop scheduler..")
@@ -45,6 +48,7 @@ func (s Scheduler) MatchWaitedUsers() {
 	log.Println("MatchWaitedUsers started")
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
+
 	// get lock
 	_, err := s.matchSvc.MatchWaitedUsers(ctx, param.MatchWaitedUsersRequest{})
 	if err != nil {

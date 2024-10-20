@@ -13,9 +13,7 @@ import (
 func AccessCheck(service authorizationservice.Service,
 	permissions ...entity.PermissionTitle) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-
 		return func(c echo.Context) (err error) {
-
 			claims := claim.GetClaimsFromEchoContext(c)
 			isAllowed, err := service.CheckAccess(claims.UserID, claims.Role, permissions...)
 			if err != nil {
@@ -26,7 +24,6 @@ func AccessCheck(service authorizationservice.Service,
 			}
 
 			if !isAllowed {
-
 				return c.JSON(http.StatusForbidden, echo.Map{
 					"message": errmsg.ErrorMsgUserNotAllowed,
 				})

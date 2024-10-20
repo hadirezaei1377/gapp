@@ -10,7 +10,6 @@ import (
 )
 
 func (h Handler) userProfile(c echo.Context) error {
-
 	claims := claim.GetClaimsFromEchoContext(c)
 
 	resp, err := h.userSvc.Profile(c.Request().Context(),

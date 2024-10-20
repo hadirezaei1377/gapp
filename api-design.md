@@ -1,5 +1,5 @@
 # User
-POST /users/register
+POST /users/register   
 
 curl -X POST http://localhost:8080/users/register
 -H "Content-Type: application/json"

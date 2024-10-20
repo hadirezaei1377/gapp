@@ -10,7 +10,6 @@ type Game struct {
 	StartTime   time.Time
 }
 
-// player is user who is playing in specified game (determine by ID)
 type Player struct {
 	ID      uint
 	UserID  uint
@@ -27,4 +26,5 @@ type PlayerAnswer struct {
 }
 
 func data() {
+
 }

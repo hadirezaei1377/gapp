@@ -3,8 +3,10 @@ package config
 import (
 	"gapp/adapter/redis"
 	"gapp/repository/mysql"
+	"gapp/scheduler"
 	"gapp/service/authservice"
 	"gapp/service/matchingservice"
+	"gapp/service/presenceservice"
 	"time"
 )
 
@@ -17,8 +19,7 @@ type HTTPServer struct {
 }
 
 type Config struct {
-	Application Application `koanf:"application"`
-
+	Application     Application            `koanf:"application"`
 	HTTPServer      HTTPServer             `koanf:"http_server"`
 	Auth            authservice.Config     `koanf:"auth"`
 	Mysql           mysql.Config           `koanf:"mysql"`

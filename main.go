@@ -7,6 +7,7 @@ import (
 	"gapp/adapter/redis"
 	"gapp/config"
 	"gapp/delivery/httpserver"
+	"gapp/logger"
 	"gapp/repository/migrator"
 	"gapp/repository/mysql"
 	"gapp/repository/mysql/mysqlaccesscontrol"
@@ -22,12 +23,15 @@ import (
 	"gapp/service/userservice"
 	"gapp/validator/matchingvalidator"
 	"gapp/validator/uservalidator"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"time"
 
 	"go.uber.org/zap"
+
+	_ "net/http/pprof"
 )
 
 const (
@@ -35,6 +39,13 @@ const (
 )
 
 func main() {
+	go func() {
+		// TODO - add enabler config variable
+		// curl http://localhost:8099/debug/pprof/goroutine --output goroutine.o
+		//  go tool pprof -http=:8086 ./goroutine.o
+		http.ListenAndServe(":8099", nil)
+	}()
+
 	// TODO - read config path from command line
 	cfg := config.Load("config.yml")
 

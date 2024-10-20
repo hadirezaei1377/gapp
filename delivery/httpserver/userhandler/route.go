@@ -12,7 +12,6 @@ func (h Handler) SetRoutes(e *echo.Echo) {
 	userGroup.GET("/profile", h.userProfile,
 		middleware.Auth(h.authSvc, h.authConfig),
 		middleware.UpsertPresence(h.presenceSvc))
-
 	userGroup.POST("/login", h.userLogin)
 	userGroup.POST("/register", h.userRegister)
 }
