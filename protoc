@@ -1,6 +1,7 @@
 protoc --go_out=. \
     --go-grpc_out=. \
+    contract/protobuf/presence/presence.proto
+
 protoc --go_out=. \
     --go-grpc_out=. \
-    contract/matching/matching.proto
-
+    contract/protobuf/matching/matching.proto

@@ -2,7 +2,7 @@ package protobufencoder
 
 import (
 	"encoding/base64"
-	"gapp/contract/golang/matching"
+	"gapp/contract/goproto/matching"
 	"gapp/entity"
 	"gapp/pkg/slice"
 

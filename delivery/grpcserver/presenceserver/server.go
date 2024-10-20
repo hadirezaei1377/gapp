@@ -3,7 +3,7 @@ package presenceserver
 import (
 	"context"
 	"fmt"
-	"gapp/contract/golang/presence"
+	"gapp/contract/goproto/presence"
 	"gapp/param"
 	"gapp/pkg/protobufmapper"
 	"gapp/pkg/slice"
@@ -30,9 +30,11 @@ func (s Server) GetPresence(ctx context.Context, req *presence.GetPresenceReques
 	resp, err := s.svc.GetPresence(ctx, param.GetPresenceRequest{
 		UserIDs: slice.MapFromUint64ToUint(req.GetUserIds()),
 	})
+
 	if err != nil {
 		return nil, err
 	}
+
 	return protobufmapper.MapGetPresenceResponseToProtobuf(resp), nil
 }
 
@@ -43,15 +45,21 @@ func (s Server) Start() {
 	if err != nil {
 		panic(err)
 	}
+
 	// pbPresenceserver
+
 	presenceSvcServer := Server{}
+
 	// grpc server
 	grpcServer := grpc.NewServer()
 	// pbPresenceserver register into grpc server
+
 	presence.RegisterPresenceServiceServer(grpcServer, &presenceSvcServer)
 	// server grpcServer by listener
+
 	log.Println("presence grpc server starting on", address)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatal("couldn't server presence grpc server")
 	}
+
 }

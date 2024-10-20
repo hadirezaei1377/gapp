@@ -79,7 +79,7 @@ func (d DB) RemoveUsersFromWaitingList(category entity.Category, userIDs []uint)
 
 	numberOfRemovedMembers, err := d.adapter.Client().ZRem(ctx, getCategoryKey(category), members...).Result()
 	if err != nil {
-		log.Errorf("remove from waiting list: %v\n", err)
+		log.Errorf("remove from waiting list: %v", err)
 		// TODO - update metrics
 	}
 

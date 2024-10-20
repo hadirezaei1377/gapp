@@ -3,6 +3,7 @@ package matchingservice
 import (
 	"context"
 	"fmt"
+	"gapp/contract/broker"
 	"gapp/entity"
 	"gapp/param"
 	"gapp/pkg/protobufencoder"
@@ -13,10 +14,6 @@ import (
 
 	"github.com/labstack/gommon/log"
 )
-
-type Publisher interface {
-	Publish(event entity.Event, payload string)
-}
 
 // TODO - add ctx to ~all repo and use-case methods if needed
 type Repo interface {
@@ -37,10 +34,10 @@ type Service struct {
 	config         Config
 	repo           Repo
 	presenceClient PresenceClient
-	pub            Publisher
+	pub            broker.Publisher
 }
 
-func New(config Config, repo Repo, presenceClient PresenceClient, pub Publisher) Service {
+func New(config Config, repo Repo, presenceClient PresenceClient, pub broker.Publisher) Service {
 	return Service{config: config, repo: repo, presenceClient: presenceClient, pub: pub}
 }
 
@@ -113,7 +110,7 @@ func (s Service) match(ctx context.Context, category entity.Category, wg *sync.W
 	for _, l := range list {
 		lastOnlineTimestamp, ok := getPresenceItem(presenceList, l.UserID)
 		// TODO - add 20 & 300 to config
-		if ok && lastOnlineTimestamp > timestamp.Add(-20*time.Second) &&
+		if ok && lastOnlineTimestamp > timestamp.Add(-60*time.Second) &&
 			l.Timestamp > timestamp.Add(-300*time.Second) {
 			finalList = append(finalList, l)
 		} else {
@@ -134,7 +131,6 @@ func (s Service) match(ctx context.Context, category entity.Category, wg *sync.W
 
 		go s.pub.Publish(entity.MatchingUsersMatchedEvent,
 			protobufencoder.EncodeMatchingUsersMatchedEvent(mu))
-		// publish a new event for mu
 
 		// remove mu users from waiting list
 		matchedUsersToBeRemoved = append(matchedUsersToBeRemoved, mu.UserIDs...)
